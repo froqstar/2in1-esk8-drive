@@ -6,12 +6,12 @@ PI = 3.14159;
 //all values are in mm
 
 
-//truck parameters
-useableTruckSize = 154; //the distance between the wheels (measured from rubber to rubber, NOT bearing to bearing!)
+// Truck parameters
+useableTruckSize = 154; // The distance between the wheels (measured from rubber to rubber, NOT bearing to bearing!)
 truckWidth = 18;
-truckAdapterDiameter = 42;
+truckAdapterDiameter = 42; // You may need to increase this when you have a very thick truck
 truckAdapterPlay = 1.3;
-truckAdapterAdjustmentAngle = 7.5; //stepsize of mount-to-truck angle adjustment. has to be a clean divisor of 90°. smaller steps are harder to print!
+truckAdapterAdjustmentAngle = 7.5; // stepsize of mount-to-truck angle adjustment. Has to be a clean divisor of 90°. Smaller steps are harder to print/have less strength!
 truckAdapterTensioningSlotWidth = 3; 
 truckAdapterTensioningSlotLength = 30;
 truckAdapterTensioningScrewDiameter = 3.1;
@@ -20,9 +20,9 @@ truckAdapterTensioningScrewCount = 2;
 truckAdapterTensioningScrewHeadDiameter = 6.1;
 truckAdapterTensioningScrewNutDiameter = 5.7;
 
-distanceScrewDiameter = 8;
+distanceScrewDiameter = 8; // The screws used to keep the two mounts at constant distance, at motor & axis
 
-//belt mechanics parameters
+// Transmission parameters
 beltWidth = 15;
 beltLength = 280;
 motorPulleyTeeth = 15;
@@ -33,8 +33,8 @@ beltPitch = 5;
 motorPulleyCircumference = motorPulleyTeeth * beltPitch;
 wheelPulleyCircumference = wheelPulleyTeeth * beltPitch;
 
-//motor parameters
-//SK3 6374 values: http://www.electric-skateboard.builders/uploads/db1493/original/3X/c/4/c40213f09c3a9efb59e033c84dde2ed19bf27e4f.png
+// Motor parameters
+// SK3 6374 values: http://www.electric-skateboard.builders/uploads/db1493/original/3X/c/4/c40213f09c3a9efb59e033c84dde2ed19bf27e4f.png
 motorHousingDiameter = 59;
 motorHousingDepth = 84.5;
 motorClearing = 2;
@@ -48,7 +48,7 @@ motorScrewHoleSpacing = 44;
 motorScrewHoleTensioningSpan = 15;
 motorScrewHeadDiameter = 8;
 
-//bearing parameters
+// Motor axis bearing parameters
 bearingDiameter = 22.1;
 bearingDepth = 7;
 bearingWallWidth = 2;
@@ -57,13 +57,13 @@ bearingScrewNutDiameter = 5.7;
 bearingScrewNutHeight = 4.4;
 bearingScrewHeadDiameter = 6;
 
-//general structural parameters
-truckMountWidth = 30;
-motorMountWidth = (useableTruckSize - 2 - wheelPulleyWidth*2 - motorHousingDepth) / 2;
-wallWidth = 6; //the minimum wall width of parts
+// General structural parameters
+truckMountWidth = 30; // width of the truck side of the mount
+motorMountWidth = (useableTruckSize - 2 - wheelPulleyWidth*2 - motorHousingDepth) / 2; // width of the motor side of the mount
+wallWidth = 6; // the minimum wall width of parts
 
-
-//yes, this is incorrect, but that is what the tensioning holes are for ;)
+// The distance between the wheel axis and the motor axis (midpoints).
+// Yes, this is incorrect, but that is what the tensioning holes are for ;)
 axesDistance = (beltLength - motorPulleyCircumference/2 - wheelPulleyCircumference/2) / 2;
 
 
@@ -104,7 +104,6 @@ module motorMount() {
 	}
 }
 
-
 module bearingMount() {
 	difference() {
 		//create outer hull
@@ -144,10 +143,20 @@ module mountHullWithAxisHole() {
 			cylinder(h=truckMountWidth, r=truckAdapterDiameter/2 + wallWidth);
 			
 			translate([axesDistance - motorScrewHoleTensioningSpan/2, 0, 0]) {
-				cylinder(h=motorMountWidth, r1=motorPulleyCircumference/(2*PI) + 2, r2=motorHousingDiameter/2 + motorClearing);
+				hull() {
+					cylinder(h=wallWidth, r=motorPulleyCircumference/(2*PI) + 2);
+					translate([0,0,motorMountWidth]) {
+						cylinder(h=wallWidth, r=motorHousingDiameter/2 + motorClearing);
+					}
+				}
 			}
 			translate([axesDistance + motorScrewHoleTensioningSpan/2, 0, 0]) {
-				cylinder(h=motorMountWidth, r1=motorPulleyCircumference/(2*PI) + 2, r2=motorHousingDiameter/2 + motorClearing);
+				hull() {
+					cylinder(h=wallWidth, r=motorPulleyCircumference/(2*PI) + 2);
+					translate([0,0,motorMountWidth]) {
+						cylinder(h=wallWidth, r=motorHousingDiameter/2 + motorClearing);
+					}
+				}
 			}
 			//distance screw hole
 			translate([-(truckAdapterDiameter/2+wallWidth*2+distanceScrewDiameter/2), 0, 0]) {
@@ -217,7 +226,6 @@ module motorMountingScrewHead(number) {
 	}
 }
 
-
 module truckSlotTensioningScrewHole(number) {
 	
 	translate([	truckAdapterDiameter/2 + wallWidth, 0, (truckMountWidth/(truckAdapterTensioningScrewCount+1)) * (number + 1)]) {
@@ -235,24 +243,6 @@ module truckSlotTensioningScrewHole(number) {
 		}
 	}
 }
-
-
-module truckAdapterBase(diameter) {
-	for (i = [0:90/truckAdapterAdjustmentAngle]) {
-		rotate([0, 0, truckAdapterAdjustmentAngle * i]) {
-			translate([0, 0, truckMountWidth/2]) {
-				cube([	2*sqrt(pow(diameter/2, 2)/2), 
-						2*sqrt(pow(diameter/2, 2)/2), 
-						truckMountWidth]
-				,center=true); 
-			}	
-		}
-	}
-	translate([0,0,truckMountWidth/3]) {
-		cylinder(h=truckMountWidth/3, d=diameter);
-	}
-}
-
 
 module bearingSleigh() {
 	difference() {
@@ -281,6 +271,22 @@ module bearingSleigh() {
 	}
 }
 
+
+module truckAdapterBase(diameter) {
+	for (i = [0:90/truckAdapterAdjustmentAngle]) {
+		rotate([0, 0, truckAdapterAdjustmentAngle * i]) {
+			translate([0, 0, truckMountWidth/2]) {
+				cube([	2*sqrt(pow(diameter/2, 2)/2), 
+						2*sqrt(pow(diameter/2, 2)/2), 
+						truckMountWidth]
+				,center=true); 
+			}	
+		}
+	}
+	translate([0,0,truckMountWidth/3]) {
+		cylinder(h=truckMountWidth/3, d=diameter);
+	}
+}
 
 module truckAdapter() {
 	difference() {
