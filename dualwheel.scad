@@ -35,7 +35,7 @@ wheelPulleyCircumference = wheelPulleyTeeth * beltPitch;
 
 // Motor parameters
 // SK3 6374 values: http://www.electric-skateboard.builders/uploads/db1493/original/3X/c/4/c40213f09c3a9efb59e033c84dde2ed19bf27e4f.png
-motorHousingDiameter = 59;
+motorHousingDiameter = 59; //59
 motorHousingDepth = 84.5;
 motorClearing = 2;
 motorAxisDiameter = 8;
