@@ -70,7 +70,7 @@ axesDistance = (beltLength - motorPulleyCircumference/2 - wheelPulleyCircumferen
 module motorMount() {
 	difference() {
 		//create outer hull
-		mountHullWithAxisHole();
+		mountHullWithAxisHole(false);
 		
 		//motor clip clearing
 		hull() {
@@ -107,7 +107,7 @@ module motorMount() {
 module bearingMount() {
 	difference() {
 		//create outer hull
-		mountHullWithAxisHole();
+		mountHullWithAxisHole(true);
 		
 		//pocket for bearing sleigh
 		translate([axesDistance, 0, motorMountWidth - bearingDepth - bearingWallWidth]) {
@@ -136,7 +136,7 @@ module bearingMount() {
 }
 
 
-module mountHullWithAxisHole() {
+module mountHullWithAxisHole(isLeft = false) {
 	difference() {
 		//outer shape
 		hull() {
@@ -158,16 +158,27 @@ module mountHullWithAxisHole() {
 					}
 				}
 			}
-			//distance screw hole
+			// rear distance screw mount
 			translate([-(truckAdapterDiameter/2+wallWidth*2+distanceScrewDiameter/2), 0, 0]) {
 				cylinder(h=truckMountWidth, d=distanceScrewDiameter+wallWidth);
 			}
+			// front distance screw mount
+			translate([axesDistance + motorHousingDiameter/2 + wallWidth*3, (isLeft ? 1:-1) * (motorHousingDiameter/2 - wallWidth*2), 0]) {
+				cylinder(h=motorMountWidth + wallWidth, d=distanceScrewDiameter+wallWidth);
+			}
 		}
-		//distance screw hole
+		// rear distance screw hole
 		translate([-(truckAdapterDiameter/2+wallWidth*2+distanceScrewDiameter/2), 0, 0]) {
 			cylinder(h=truckMountWidth, d=distanceScrewDiameter);
 		}
 		translate([-(truckAdapterDiameter/2+wallWidth*2+distanceScrewDiameter/2), 0, 0]) {
+			cylinder(d=21, h=6);
+		}
+		// front distance screw hole
+		translate([axesDistance + motorHousingDiameter/2 + wallWidth*3, (isLeft ? 1:-1) * (motorHousingDiameter/2 - wallWidth*2), 0]) {
+			cylinder(h=truckMountWidth, d=distanceScrewDiameter);
+		}
+		translate([axesDistance + motorHousingDiameter/2 + wallWidth*3, (isLeft ? 1:-1) * (motorHousingDiameter/2 - wallWidth*2), 0]) {
 			cylinder(d=21, h=6);
 		}
 		
@@ -204,7 +215,7 @@ module mountHullWithAxisHole() {
 		}
 		//truck adapter tensioner screwholes
 		for (i = [0:truckAdapterTensioningScrewCount-1]) {
-			truckSlotTensioningScrewHole(i);
+			truckSlotTensioningScrewHole(i, isLeft);
 		}
 	}
 }
@@ -226,10 +237,10 @@ module motorMountingScrewHead(number) {
 	}
 }
 
-module truckSlotTensioningScrewHole(number) {
+module truckSlotTensioningScrewHole(number, isLeft=false) {
 	
 	translate([	truckAdapterDiameter/2 + wallWidth, 0, (truckMountWidth/(truckAdapterTensioningScrewCount+1)) * (number + 1)]) {
-		rotate([90,0,0]) {
+		rotate([(isLeft ? -1:1)*90,0,0]) {
 			cylinder(h=motorHousingDiameter + 2*wallWidth,d=truckAdapterTensioningScrewDiameter, center=true);
 			//head hole
 			translate([0,0,truckAdapterTensioningScrewLength]) {
