@@ -126,7 +126,7 @@ module bearingMount() {
 				}
 			}
 			//setscrew head hole
-			translate([motorScrewHoleTensioningSpan/2 + bearingDiameter + wallWidth/2, 0, bearingDepth/2]) {
+			translate([motorScrewHoleTensioningSpan/2 + bearingDiameter + wallWidth, 0, bearingDepth/2]) {
 				rotate([0,90,0]) {
 					cylinder(h=wallWidth + 30, d=bearingScrewHeadDiameter);
 				}
